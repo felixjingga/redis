@@ -1527,6 +1527,19 @@ var _ = Describe("Commands", func() {
 			}, "2s", "100ms").Should(Equal(redis.Nil))
 		})
 
+		It("should PSetEX", func() {
+			err := client.PSetEx(ctx, "key", "hello", 80*time.Millisecond).Err()
+			Expect(err).NotTo(HaveOccurred())
+
+			val, err := client.Get(ctx, "key").Result()
+			Expect(err).NotTo(HaveOccurred())
+			Expect(val).To(Equal("hello"))
+
+			Eventually(func() error {
+				return client.Get(ctx, "foo").Err()
+			}, "2s", "100ms").Should(Equal(redis.Nil))
+		})
+
 		It("should SetNX", func() {
 			setNX := client.SetNX(ctx, "key", "hello", 0)
 			Expect(setNX.Err()).NotTo(HaveOccurred())

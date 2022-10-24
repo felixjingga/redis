@@ -138,6 +138,7 @@ type Cmdable interface {
 	Set(ctx context.Context, key string, value interface{}, expiration time.Duration) *StatusCmd
 	SetArgs(ctx context.Context, key string, value interface{}, a SetArgs) *StatusCmd
 	SetEx(ctx context.Context, key string, value interface{}, expiration time.Duration) *StatusCmd
+	PSetEx(ctx context.Context, key string, value interface{}, expiration time.Duration) *StatusCmd
 	SetNX(ctx context.Context, key string, value interface{}, expiration time.Duration) *BoolCmd
 	SetXX(ctx context.Context, key string, value interface{}, expiration time.Duration) *BoolCmd
 	SetRange(ctx context.Context, key string, offset int64, value string) *IntCmd
@@ -972,6 +973,13 @@ func (c cmdable) SetArgs(ctx context.Context, key string, value interface{}, a S
 // SetEx Redis `SETEx key expiration value` command.
 func (c cmdable) SetEx(ctx context.Context, key string, value interface{}, expiration time.Duration) *StatusCmd {
 	cmd := NewStatusCmd(ctx, "setex", key, formatSec(ctx, expiration), value)
+	_ = c(ctx, cmd)
+	return cmd
+}
+
+// SetEx Redis `SETEx key expiration value` command.
+func (c cmdable) PSetEx(ctx context.Context, key string, value interface{}, expiration time.Duration) *StatusCmd {
+	cmd := NewStatusCmd(ctx, "psetex", key, formatMs(ctx, expiration), value)
 	_ = c(ctx, cmd)
 	return cmd
 }
